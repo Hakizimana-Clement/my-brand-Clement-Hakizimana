@@ -1,5 +1,3 @@
-console.log("home page");
-
 // html elements
 // const blogMainContainer = document.querySelector(".testing-blog-home");
 const blogMainContainer = document.querySelector(".gallery");
@@ -11,6 +9,8 @@ const blogJSON = localStorage.getItem("blogs");
 if (blogJSON !== null) {
   blogs = JSON.parse(blogJSON);
 } else {
+  document.querySelector(".gallery").style.justifyContent = "center";
+  document.querySelector(".gallery-wrapper").style.marginTop = "4rem";
   blogMainContainer.innerHTML = `<p>No Blogs</p>`;
 }
 
@@ -21,10 +21,12 @@ const renderBlogs = (blogsArr) => {
     const blogContainer = document.createElement("div");
     blogContainer.classList.add("card-container");
     // blog link container
+	  // This is blocked link
+      //`../../single-blog-page.html#${blog.id}`
     const linkContainer = document.createElement("a");
     linkContainer.setAttribute(
       "href",
-      `../../single-blog-page.html#${blog.id}`
+      `single-blog-page.html#${blog.id}`
     );
     linkContainer.classList.add("card-blog-link");
 
@@ -62,27 +64,62 @@ const renderBlogs = (blogsArr) => {
 
     // h2
     const h2El = document.createElement("h2");
-    h2El.textContent = blog.title;
-    h2El.classList.add("name");
+    h2El.textContent =
+      blog.title.length > 24 ? `${blog.title.slice(0, 24)} ...` : blog.title;
+    h2El.classList.add("blogs-container__card-title");
     cardContentDiv.append(h2El);
 
-    //p
-    const pEl = document.createElement("p");
-    console.log(blog.body);
+    ///////////////////////////////////////////// paragraph //////////////////////////////////////
+    // const pEl = document.createElement("p");
+    // // console.log(blog.body);
+    // const content = blog.body;
+    // // const cleanContent = content.replace(/<\/?p>/g, "").slice(2, 65);
+    // // // pEl.textContent = `${blog.body.slice(3, 65)}...`;
+    // // pEl.textContent = `${cleanContent}...`;
+    // // Remove <p> and </p> tags and HTML entity codes
+    // const cleanContent = content
+    //   .replace(/<\/?p>/g, "")
+    //   .replace(/&amp;nbsp;/g, "")
+    //   .trim();
+
+    // // Truncate the text if it's too long
+    // const truncatedContent =
+    //   cleanContent.slice(0, 63) + (cleanContent.length > 63 ? "..." : "");
+    // pEl.textContent = truncatedContent;
+
+    // // error
+    // pEl.classList.add("blogs-container__card-description", "description");
+    // cardContentDiv.append(pEl);
+    // Assume blog.body contains the text content from local storage
     const content = blog.body;
-    const cleanContent = content.replace(/<\/?p>/g, "");
-    // pEl.textContent = `${blog.body.slice(3, 65)}...`;
-    pEl.textContent = `${cleanContent}...`;
-    // error
+
+    // Remove <p> and </p> tags and HTML entity codes
+    const cleanContent = content
+      .replace(/<\/?p>/g, "")
+      .replace(/&amp;nbsp;/g, "")
+      .trim();
+
+    // Truncate the text if it's too long
+    const truncatedContent =
+      cleanContent.slice(0, 63) + (cleanContent.length > 63 ? "..." : "");
+
+    // Create a paragraph element and set its text content
+    const pEl = document.createElement("p");
+    pEl.textContent = truncatedContent;
+
+    // Add classes to the paragraph element
     pEl.classList.add("blogs-container__card-description", "description");
+
+    // Append the paragraph element to the container
     cardContentDiv.append(pEl);
+
     // comment and likes
     // comment and like -> card content
     const commentAndLikeContainer = document.createElement("div");
     commentAndLikeContainer.classList.add(
       "blogs-container__card-likes-and-comments-container"
     );
-
+    console.log(blog);
     // ////// WRITE CONTAINER///////
     // writer image, name and date container -> writer container
     const writeContainer = document.createElement("div");
@@ -138,11 +175,11 @@ const renderBlogs = (blogsArr) => {
     const likeIcon = document.createElement("span");
     likeIcon.innerHTML = `<svg
                           xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
+                          fill= "#ff0000";
+                          stroke="white"
                           viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                        >
+                          stroke-width="1"
+                          >
                           <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
@@ -172,10 +209,10 @@ const renderBlogs = (blogsArr) => {
     const commentIcon = document.createElement("span");
     commentIcon.innerHTML = `    <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
+                          fill="#28396d"
+                          stroke="white"
                           viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
+                          stroke-width="1"
                         >
                           <path
                             stroke-linecap="round"
@@ -191,7 +228,7 @@ const renderBlogs = (blogsArr) => {
     commentNum.classList.add("comment-number");
     commentDiv.append(commentNum);
 
-    console.log(blog);
+    // console.log(blog);
     // renders
     // card container -> start card
     blogContainer.append(linkContainer);

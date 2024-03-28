@@ -13,6 +13,11 @@ const likeLinkEl = document.querySelector(
 const commentFormEl = document.querySelector(".leave-comment__form-and-input");
 const commentMainContainer = document.querySelector(".comments-colors");
 const noCommentPEl = document.querySelector(".no-comment");
+const errorEl = document.querySelector(".error");
+const paragraphContainer = document.querySelector(
+  ".blog-content__paragraph--container"
+);
+
 // remove # on id
 const blogId = location.hash.substring(1);
 
@@ -31,21 +36,50 @@ const blog = blogs.find((blog) => blog.id === blogId);
 if (blog === undefined) {
   location.assign("/index.html");
 }
-// **************************
 
-//  updating page
-
+// **************************UPDATING PAGE CONTEXT **************************
 // title
 h1El.textContent = blog.title;
 // blog image
 imgEl.src = blog.coverImage;
 
-pEl.textContent = blog.body.slice(3);
+// pEl.textContent = blog.body;
 // writer img
 writeImage.src = blog.writerImage;
 // writer name
 writeName.textContent = blog.writer;
 
+///////////// rendering paragraph from local storage //////////
+const paragraphContext = document.createElement("p");
+// paragraphContext.textContent = blog.body;
+// paragraphContainer.append(paragraphContext);
+
+const createParagraph = (text) => {
+  const paragraph = document.createElement("p");
+  paragraph.classList.add("blog-content__paragraph");
+  paragraph.textContent = text;
+  paragraphContainer.append(paragraph);
+};
+
+const text = blog.body;
+const words = text.split(" ");
+// console.log(words);
+let paragraphText = "";
+let paragraphCount = 0;
+
+words.forEach((word) => {
+  if (paragraphText.length + word.length + 1 <= 300) {
+    paragraphText += word + " ";
+  } else {
+    createParagraph(paragraphText.trim());
+    paragraphText = word + " ";
+    paragraphCount++;
+  }
+});
+// create paragraph for the remaining text
+if (paragraphText) {
+  createParagraph(paragraphText.trim());
+}
 //********************** LIKE********************* */
 // find blog which matched id
 const blogIndex = blogs.findIndex((blog) => blog.id === blogId);
@@ -67,33 +101,95 @@ if (blogIndex !== -1) {
 }
 
 //********************** COMMENTS ********************* */
+
+// errors
+let formErrors = {
+  nameError: null,
+  emailError: null,
+  commentTextError: null,
+};
+
+// display error below input
+const showFormErrors = (error) => {
+  // name
+  document.querySelector("#name-error").textContent = error.nameError;
+
+  //email
+  document.querySelector("#email-error").textContent = error.emailError;
+  // comment text
+  document.querySelector("#comment-text-error").textContent =
+    error.commentTextError;
+};
+
 //********************** FORM ********************* */
 commentFormEl.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  //******* add comment in local storage *****************
+  //******* Form Validation *****************
+  // state
+  let hasErrors = false;
 
-  const newComment = {
-    commentId: uuidv4(),
-    commentUsername: e.target.elements.name.value,
-    commentEmail: e.target.elements.email.value,
-    commentText: e.target.elements.comment.value,
-    commentLiked: false,
-  };
-
-  const blogIndex = blogs.findIndex((blog) => blog.id === blogId);
-  // blog index found
-  if (blogIndex !== -1) {
-    // Here we targer the blog we want to update and then add comment in it.
-    blogs[blogIndex].comments.push(newComment);
-    // localstorage
-    localStorage.setItem("blogs", JSON.stringify(blogs));
-    renderComments(blogs);
-    commentFormEl.reset();
+  const nameInput = e.target.elements.name.value.trim();
+  const emailInput = e.target.elements.email.value.trim();
+  const commentInput = e.target.elements.comment.value.trim();
+  // validate name validation
+  if (nameInput.length === 0) {
+    formErrors.nameError = "Please enter your name";
+    hasErrors = true;
+  } else if (nameInput.length < 3) {
+    formErrors.nameError = "Name should be at least 3 character.";
+    hasErrors = true;
   } else {
-    console.log("Blog comment not found");
+    formErrors.nameError = null;
   }
 
+  // validate email validation
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(emailInput)) {
+    formErrors.emailError = "Invalid email address.";
+    hasErrors = true;
+  } else {
+    formErrors.emailError = null;
+  }
+
+  // comment text validation
+  if (commentInput.length === 0) {
+    formErrors.commentTextError = "Please enter your comment";
+    hasErrors = true;
+  } else if (commentInput.length > 400) {
+    formErrors.commentTextError =
+      "Your comment should be less than 400 character.";
+    hasErrors = true;
+  } else {
+    formErrors.commentTextError = null;
+  }
+
+  showFormErrors(formErrors);
+
+  if (!hasErrors) {
+    e.target.reset();
+    //******* add comment in local storage *****************
+    const newComment = {
+      commentId: uuidv4(),
+      commentUsername: nameInput,
+      commentEmail: emailInput,
+      commentText: commentInput,
+      commentLiked: false,
+    };
+
+    const blogIndex = blogs.findIndex((blog) => blog.id === blogId);
+    // blog index found
+    if (blogIndex !== -1) {
+      // Here we targer the blog we want to update and then add comment in it.
+      blogs[blogIndex].comments.push(newComment);
+      // localstorage
+      localStorage.setItem("blogs", JSON.stringify(blogs));
+      renderComments(blogs);
+      commentFormEl.reset();
+    } else {
+      console.log("Blog comment not found");
+    }
+  }
   //************************************
 });
 // console.log(blogs);
@@ -105,9 +201,18 @@ const renderComments = (blogs) => {
   if (blogIndex !== -1) {
     // comment array
     const commentArr = blogs[blogIndex].comments;
-    if (commentArr.length === 0) {
+    console.log(commentArr.length);
+    if (commentArr.length <= 0) {
       noCommentPEl.textContent = "No Comments";
+      commentMainContainer.style.padding = "1.5rem ";
+      renderComments(blog);
     } else {
+      // clean comment message
+      noCommentPEl.textContent = "";
+      // clean container
+      commentMainContainer.innerHTML = "";
+
+      commentMainContainer.style.padding = "0";
       commentArr.forEach((comment) => {
         // comment card or container
         const commentCard = document.createElement("div");
@@ -115,12 +220,13 @@ const renderComments = (blogs) => {
 
         // empty div -> comment card
         const commentHolderCard = document.createElement("div");
+        commentHolderCard.classList.add("container");
         commentCard.append(commentHolderCard);
 
         //******************* name and comment text *********************
         // bubble comment
         const commentBubbleTextContaner = document.createElement("div");
-        commentBubbleTextContaner.classList.add("comment-buble");
+        commentBubbleTextContaner.classList.add("comment-buble", "container");
         commentHolderCard.append(commentBubbleTextContaner);
 
         // name
@@ -217,9 +323,13 @@ const renderComments = (blogs) => {
         // reply coming soon
         // add comment card to main comment card
         commentMainContainer.append(commentCard);
-        console.log(comment);
+
+        // console.log(comment);
       });
     }
   }
 };
+
+// render existing comment
+
 renderComments(blogs);

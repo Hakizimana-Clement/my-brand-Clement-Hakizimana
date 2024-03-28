@@ -197,6 +197,9 @@
 }
 /* xs */
 /* @media(min-width:475px){} */
+.gallery-wrapper {
+  margin-top: 3rem;
+}
 
 /* sm */
 @media (min-width: 640px) {
@@ -325,6 +328,9 @@
   border-radius: 13px;
   box-shadow: 0px 2px 7px rgba(104, 116, 221, 0.25);
   /* width: 463px; */
+  width: 400px;
+  height: 470px;
+  overflow-y: hidden;
 }
 .card-image {
   position: relative;
@@ -448,6 +454,7 @@
   justify-content: center;
   /* margin: 10% auto; */
   margin: 0 auto;
+  gap: 6rem;
 }
 
 #backBtn,
@@ -473,19 +480,19 @@
 /* @media(min-width:475px){} */
 
 /* sm */
-@media (min-width: 640px) {
+/* @media (min-width: 640px) {
   .card-container {
     width: 100%;
   }
-}
+} */
 
 /* md */
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .card-container {
     grid-template-columns: auto;
     width: 50%;
-  }
-}
+  } */
+/* } */
 
 /* lg*/
 /* @media(min-width:1024px){} */
@@ -504,4 +511,87 @@
 
 .card {
   width: 400px;
+  height: 495px;
+}
+.card-content {
+  margin-top: 1.5rem;
+}
+.card-img {
+  border-radius: 11px;
+}
+
+/* @media (min-width: 1024px) and (max-width: 1536px) { */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  /* .blogs-container__card-title {
+    color: yellow;
+  } */
+  .gallery-wrapper {
+    gap: 0;
+  }
+  .card-container {
+    width: 50%;
+  }
+}
+
+@media (min-width: 1281px) and (max-width: 1536px) {
+  .gallery-wrapper {
+    gap: 0;
+  }
+
+  .gallery {
+    width: 100%;
+  }
+
+  .card-container {
+    /* width: 32%; */
+    width: 34%;
+  }
+  .card {
+    /* width: 339px; */
+    /* width: 289px; */
+    /* width: 291px; */
+    width: 337px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  /* .blogs-container__card-title {
+    color: green;
+  } */
+  .gallery-wrapper {
+    gap: 0;
+  }
+  .card-container {
+    justify-items: center;
+  }
+}
+@media (min-width: 475px) and (max-width: 639px) {
+  /* .blogs-container__card-title {
+    color: rgb(128, 0, 122);
+  } */
+
+  .gallery-wrapper {
+    gap: 0;
+  }
+  .card {
+    /* width: 329px;
+    height: 511px; */
+    width: 366px;
+    height: 538px;
+  }
+  .card-container {
+    justify-items: center;
+  }
+}
+
+@media (min-width: 200px) and (max-width: 474px) {
+  /* .blogs-container__card-title {
+    color: rgb(0, 0, 0);
+  } */
+  .gallery-wrapper {
+    gap: 0;
+  }
+  .card {
+    width: 287px;
+  }
 }
